@@ -14,11 +14,6 @@ def main():
     game = CluedoGame()
 
     # Main loop
-    game_loop(screen, game)
-
-    pygame.quit()
-
-def game_loop(screen, game):
     # Define colors
     BG = (0, 143, 213)
 
@@ -40,6 +35,9 @@ def game_loop(screen, game):
 
         # Update display
         pygame.display.flip()
+
+    pygame.quit()
+    
 
 if __name__ == "__main__":
     main()
