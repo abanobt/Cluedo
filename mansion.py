@@ -37,7 +37,7 @@ class Mansion :
     def move_player(self, player, new_room):
         old_room = self.get_player_room(player)
         old_room.move_player_out(player)
-        self.rooms[new_room].move_player_in(player)
+        new_room.move_player_in(player)
 
     def draw_board(self, screen):
         screen.blit(self.background_image, (0, 0)) 

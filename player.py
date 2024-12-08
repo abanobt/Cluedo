@@ -19,12 +19,14 @@ class Player:
         self.image = pygame.image.load(PLAYER_IMAGES[playerid])
         self.cards = dealt_cards
         self.knowledge = PlayerKnowledge(dealt_cards)
-
-    def see_card(self, card):
-        self.knowledge.add_card(card)
+        self.is_disqualified = False
 
     def draw(self, screen, position):
         screen.blit(self.image, position)
+        
+    def no_refutation(self, weapon, room, suspect):
+        if (room not in self.cards):
+            self.knowledge.complete(weapon, room, suspect)
 
     def draw_info(self, screen):
         position = 15
@@ -42,6 +44,8 @@ class Player:
         return self.id.name
 
     def __eq__(self, other):
+        if other is None:
+            return False
         return self.id == other.id
 
 class PlayerKnowledge:
@@ -59,6 +63,14 @@ class PlayerKnowledge:
 
         if isinstance(card, Character):
             self.known_suspects.add(card)
+
+    def complete(self, weapon, room, suspect):
+        self.known_weapons = set(e for e in Weapon)
+        self.known_weapons.remove(weapon)
+        self.known_rooms = set(e for e in RoomId)
+        self.known_rooms.remove(room)
+        self.known_suspects = set(e for e in Character)
+        self.known_suspects.remove(suspect)
 
     def get_knowledge_diff(self):
         return (set(e for e in Weapon) - self.known_weapons, set(e for e in RoomId) - self.known_rooms, set(e for e in Character) - self.known_suspects)

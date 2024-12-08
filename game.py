@@ -44,6 +44,9 @@ class CluedoGame:
         turn = self.current_player_turn
         # For now all the players will be AI, but eventually one player will be the user
         player = self.players[turn]
+        if player.is_disqualified:
+            self.current_player_turn = 0 if turn + 1 >= len(self.players) else turn + 1
+            return
         # if player.is_user:
             # action = input.get_user_action
             # if action == None:
@@ -51,8 +54,11 @@ class CluedoGame:
         action = get_ai_action(self.players[turn], self.mansion)
         self.do_move(player, action)
         self.do_suggestion(player, action)
-        self.do_accusation(player, action)
+        result = self.do_accusation(player, action)
+        if result == 1:
+            return player
         self.current_player_turn = 0 if turn + 1 >= len(self.players) else turn + 1
+        return None
 
 
     def do_move(self, player, action):
@@ -61,32 +67,34 @@ class CluedoGame:
             return
 
         room = self.mansion.get_player_room(player)
-        connections = room.get_connections()
-        new_room = connections[action.move_room_index]
-        self.mansion.move_player(player, new_room)
-        self.prev_action[0] = "Prev: {0} moved from {1} to {2}".format(player.get_name(), room.get_name(), new_room.name)
+        self.mansion.move_player(player, action.move_room)
+        self.prev_action[0] = "Prev: {0} moved from {1} to {2}".format(player.get_name(), room.get_name(), action.move_room.id.name)
 
     def do_suggestion(self, player, action):
         if not action.want_suggestion:
             self.prev_action[1] = "     and did not suggest"
+            self.prev_action[3] = "No player refuted the suggestion"
             return
         self.prev_action[1] = "     and suggested {0}/{1}".format(action.suggestion_weapon.name, action.suggestion_char.name)
-        index = self.current_player_index
+        index = self.current_player_turn
         index = 0 if index + 1 >= len(self.players) else index + 1
-        while index != self.current_player_index:
+        while index != self.current_player_turn:
             other_player = self.players[index];
             # if other_player.is_user:
                 #self.awaiting_player_refutation
                 # return
             # else
+            random.shuffle(other_player.cards)
             for card in other_player.cards:
                 if ((isinstance(card, Weapon) and card == action.suggestion_weapon) or \
-                    (isinstance(card, RoomId) and card == self.mansion.get_player_room(player)) or \
+                    (isinstance(card, RoomId) and card == self.mansion.get_player_room(player).id) or \
                     (isinstance(card, Character) and card == action.suggestion_char)):
-                    other_player.see_card(card)
+                    player.knowledge.add_card(card)
                     self.prev_action[3] = "Player {0} refuted suggestion with {1}".format(other_player.get_name(), card.name)
                     return
-        self.prev_action[3] = "No player refued the suggestion"
+            index = 0 if index + 1 >= len(self.players) else index + 1
+        player.no_refutation(action.suggestion_weapon, self.mansion.get_player_room(player).id, action.suggestion_char)
+        self.prev_action[3] = "No player refuted the suggestion"
         
             
 
@@ -94,7 +102,16 @@ class CluedoGame:
         if not action.want_accusation:
             self.prev_action[2] = "     and did not accuse"
             return
-        self.prev_action[2] = "     and accused {0}/{1}".format(action.suggestion_weapon.name, action.suggestion_char.name)        
+        # Check the validity of the accusation
+        solution_suspect, solution_room, solution_weapon = self.solution
+        if self.mansion.get_player_room(player).id == solution_room and \
+           action.suggestion_weapon == solution_weapon and \
+           action.suggestion_char == solution_suspect:
+            self.prev_action[2] = "     and correctly accused {1} with {0}".format(action.suggestion_weapon.name, action.suggestion_char.name)
+            return 1 # Game over player wins
+        self.prev_action[2] = "     and falsely accused {1} with {0}".format(action.suggestion_weapon.name, action.suggestion_char.name)
+        player.is_disqulified = True
+        return 0      
 
     def draw(self, screen):
         self.mansion.draw_board(screen)
@@ -103,6 +120,6 @@ class CluedoGame:
         for t in self.prev_action:
             draw_text(t, (160,255,200), (500, position), screen)
             position = position + 30
-        draw_text("(DEBUG) Solution: {0}, {1}, {2}".format(self.solution[0].name, self.solution[1].name, self.solution[2].name), (200,200,200), (500, position), screen)
+        draw_text("Solution: {0}, {1}, {2}".format(self.solution[0].name, self.solution[1].name, self.solution[2].name), (200,200,200), (500, position), screen)
 
 
