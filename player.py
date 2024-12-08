@@ -20,9 +20,6 @@ class Player:
         self.cards = dealt_cards
         self.knowledge = PlayerKnowledge(dealt_cards)
         self.is_disqualified = False
-
-    def draw(self, screen, position):
-        screen.blit(self.image, position)
         
     def no_refutation(self, weapon, room, suspect):
         if (room not in self.cards):
@@ -30,7 +27,7 @@ class Player:
 
     def draw_info(self, screen):
         position = 15
-        draw_text("Current Player: {0}".format(self.get_name()), (255,255,255), (500, position), screen)
+        draw_text("Current Player: {0}".format(self.id.name), (255,255,255), (500, position), screen)
         position = position + 30
         text = "    Cards: "
         for card in self.cards:
@@ -39,9 +36,6 @@ class Player:
         position = position + 30
         position = self.knowledge.draw_info(screen, position)
         return position
-
-    def get_name(self):
-        return self.id.name
 
     def __eq__(self, other):
         if other is None:

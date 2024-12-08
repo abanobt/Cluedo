@@ -30,7 +30,7 @@ def get_action_towards_solution(aiplayer, mansion, solution_weapon, solution_roo
     if room.id == solution_room:
         return Action(False, 0, True, False, solution_weapon, solution_suspect)
 
-    for connection in room.get_connections():
+    for connection in room.connections:
         # Player is connected to solution room
         if connection == solution_room:
             return Action(True, connection, True, False, solution_weapon, solution_suspect)
@@ -50,7 +50,7 @@ def find_path_to_room(start_room, goal_room_id):
         visited.add(current_node)
         if current_node == goal_room_id:
             return path[1] # return the second element in the path, which is the next node to move to
-        for neighbor in mansion.rooms[current_node].get_connections():
+        for neighbor in mansion.rooms[current_node].connections:
             if neighbor not in visited:
                 queue.append((neighbor, path + [neighbor]))
     return None
@@ -66,7 +66,7 @@ def determine_next_move(mansion, start_room, aiplayer):
         visited.add(current_node)
         if current_node != start_room.id and current_node not in aiplayer.knowledge.known_rooms:
             return path[1] # return the second element in the path, which is the next node to move to
-        for neighbor in mansion.rooms[current_node].get_connections():
+        for neighbor in mansion.rooms[current_node].connections:
             if neighbor not in visited:
                 queue.append((neighbor, path + [neighbor]))
     return start_room.id

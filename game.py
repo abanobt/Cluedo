@@ -63,19 +63,19 @@ class CluedoGame:
 
     def do_move(self, player, action):
         if not action.want_move:
-            self.prev_action[0] = "Prev: {0} did not move".format(player.get_name())
+            self.prev_action[0] = "Last turn: Player {0} did not move".format(player.id.name)
             return
 
         room = self.mansion.get_player_room(player)
         self.mansion.move_player(player, action.move_room)
-        self.prev_action[0] = "Prev: {0} moved from {1} to {2}".format(player.get_name(), room.get_name(), action.move_room.id.name)
+        self.prev_action[0] = "Last turn: Player {0} moved from {1} to {2}".format(player.id.name, room.id.name, action.move_room.id.name)
 
     def do_suggestion(self, player, action):
         if not action.want_suggestion:
             self.prev_action[1] = "     and did not suggest"
             self.prev_action[3] = "No player refuted the suggestion"
             return
-        self.prev_action[1] = "     and suggested {0}/{1}".format(action.suggestion_weapon.name, action.suggestion_char.name)
+        self.prev_action[1] = "     and suggested {1} with {0}".format(action.suggestion_weapon.name, action.suggestion_char.name)
         index = self.current_player_turn
         index = 0 if index + 1 >= len(self.players) else index + 1
         while index != self.current_player_turn:
@@ -90,7 +90,7 @@ class CluedoGame:
                     (isinstance(card, RoomId) and card == self.mansion.get_player_room(player).id) or \
                     (isinstance(card, Character) and card == action.suggestion_char)):
                     player.knowledge.add_card(card)
-                    self.prev_action[3] = "Player {0} refuted suggestion with {1}".format(other_player.get_name(), card.name)
+                    self.prev_action[3] = "Player {0} refuted suggestion with {1}".format(other_player.id.name, card.name)
                     return
             index = 0 if index + 1 >= len(self.players) else index + 1
         player.no_refutation(action.suggestion_weapon, self.mansion.get_player_room(player).id, action.suggestion_char)

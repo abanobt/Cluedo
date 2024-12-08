@@ -21,7 +21,7 @@ class Mansion :
         room_values = list(self.rooms.values())
         for player in players:
             rand_room = random.choice(room_values)
-            rand_room.move_player_in(player)
+            rand_room.players.append(player)
 
         # Load image
         self.background_image = pygame.image.load("mansion.png")
@@ -30,14 +30,14 @@ class Mansion :
     def get_player_room(self, player):
         for roomid in self.rooms:
             room = self.rooms[roomid]
-            if room.has_player(player):
+            if player in room.players:
                 return room
 
     # Move a player from one room to another
     def move_player(self, player, new_room):
         old_room = self.get_player_room(player)
-        old_room.move_player_out(player)
-        new_room.move_player_in(player)
+        old_room.players.remove(player)
+        new_room.players.append(player)
 
     def draw_board(self, screen):
         screen.blit(self.background_image, (0, 0)) 
