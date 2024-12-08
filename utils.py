@@ -3,25 +3,20 @@ import pygame
 FONT = None
 
 def draw_text(text, color, position, screen):
+    """
+    Renders text onto a Pygame screen at the specified position.
+    
+    Parameters:
+    - text (str): The string to be rendered.
+    - color (tuple): RGB tuple specifying the color of the text (e.g., (255, 255, 255) for white).
+    - position (tuple): The (x, y) position where the text will be drawn on the screen.
+    - screen (pygame.Surface): The Pygame surface on which the text will be rendered.
+    """
     global FONT
     if FONT == None:
-        FONT = pygame.font.Font(None, 20)
+        FONT = pygame.font.Font(None, 22)
     text_surface = FONT.render(text, True, color)
     text_rect = text_surface.get_rect() 
     text_rect.topleft = position
     screen.blit(text_surface, text_rect)
-
-def draw_button(text, position, size, screen):
-    mouse = pygame.mouse.get_pos()
-    is_hovering = mouse[0] > position[0] and mouse[0] < position[0] + size[0] \
-            and mouse[1] > position[1] and mouse[1] < position[1] + size[1]
-    pygame.draw.rect(screen, (0,100,200) if is_hovering else (0,0,0), [position[0],position[1],size[0],size[1]])
-    global FONT
-    if FONT == None:
-        FONT = pygame.font.Font(None, 25)
-    text_surface = FONT.render(text, True, (255,255,255))
-    text_rect = text_surface.get_rect()
-    text_rect.topleft = (position[0] + (size[0] - text_rect.width) / 2, position[1] + (size[1] - text_rect.height) / 2)
-    screen.blit(text_surface, text_rect)
-    return is_hovering
 

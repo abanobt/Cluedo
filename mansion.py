@@ -5,6 +5,10 @@ import random
 
 class Mansion :
     def __init__(self, players):
+        """
+        Initialize the mansion with its rooms and randomly assign players to starting rooms.
+        """
+        # Define rooms and their connections
         self.rooms = {
             RoomId.Ballroom: Room(RoomId.Ballroom, [RoomId.Kitchen, RoomId.Conservatory]),
             RoomId.Conservatory: Room(RoomId.Conservatory, [RoomId.Ballroom, RoomId.BilliardRoom]),
@@ -23,23 +27,31 @@ class Mansion :
             rand_room = random.choice(room_values)
             rand_room.players.append(player)
 
-        # Load image
+        # Load the mansion background image
         self.background_image = pygame.image.load("mansion.png")
 
-    # Get the room where the player is located
     def get_player_room(self, player):
+        """
+        Find and return the room where the specified player is located.
+        """
         for roomid in self.rooms:
             room = self.rooms[roomid]
             if player in room.players:
                 return room
 
-    # Move a player from one room to another
     def move_player(self, player, new_room):
+        """
+        Move a player from their current room to a new room.
+        """
         old_room = self.get_player_room(player)
         old_room.players.remove(player)
         new_room.players.append(player)
 
     def draw_board(self, screen):
+        """
+        Render the mansion board and its rooms on the screen.
+        """
         screen.blit(self.background_image, (0, 0)) 
         for room in self.rooms:
             self.rooms[room].draw(screen)
+

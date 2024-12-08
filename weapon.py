@@ -1,5 +1,6 @@
 from enum import Enum
 
+# Represens the weapons
 class Weapon(Enum):
     Candlestick = 1,
     Spanner = 2,
