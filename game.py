@@ -63,19 +63,19 @@ class CluedoGame:
 
     def do_move(self, player, action):
         if not action.want_move:
-            self.prev_action[0] = "Last turn: Player {0} did not move".format(player.id.name)
+            self.prev_action[0] = f"Last turn: Player {player.id.name} did not move"
             return
 
         room = self.mansion.get_player_room(player)
         self.mansion.move_player(player, action.move_room)
-        self.prev_action[0] = "Last turn: Player {0} moved from {1} to {2}".format(player.id.name, room.id.name, action.move_room.id.name)
+        self.prev_action[0] = f"Last turn: Player {player.id.name} moved from {room.id.name} to {action.move_room.id.name}"
 
     def do_suggestion(self, player, action):
         if not action.want_suggestion:
             self.prev_action[1] = "     and did not suggest"
             self.prev_action[3] = "No player refuted the suggestion"
             return
-        self.prev_action[1] = "     and suggested {1} with {0}".format(action.suggestion_weapon.name, action.suggestion_char.name)
+        self.prev_action[1] = f"     and suggested {action.suggestion_weapon.name} with {action.suggestion_char.name}"
         index = self.current_player_turn
         index = 0 if index + 1 >= len(self.players) else index + 1
         while index != self.current_player_turn:
@@ -90,7 +90,7 @@ class CluedoGame:
                     (isinstance(card, RoomId) and card == self.mansion.get_player_room(player).id) or \
                     (isinstance(card, Character) and card == action.suggestion_char)):
                     player.knowledge.add_card(card)
-                    self.prev_action[3] = "Player {0} refuted suggestion with {1}".format(other_player.id.name, card.name)
+                    self.prev_action[3] = f"Player {other_player.id.name} refuted suggestion with {card.name}"
                     return
             index = 0 if index + 1 >= len(self.players) else index + 1
         player.no_refutation(action.suggestion_weapon, self.mansion.get_player_room(player).id, action.suggestion_char)
@@ -107,9 +107,9 @@ class CluedoGame:
         if self.mansion.get_player_room(player).id == solution_room and \
            action.suggestion_weapon == solution_weapon and \
            action.suggestion_char == solution_suspect:
-            self.prev_action[2] = "     and correctly accused {1} with {0}".format(action.suggestion_weapon.name, action.suggestion_char.name)
-            return 1 # Game over player wins
-        self.prev_action[2] = "     and falsely accused {1} with {0}".format(action.suggestion_weapon.name, action.suggestion_char.name)
+            self.prev_action[2] = f"     and correctly accused {action.suggestion_char.name} with {action.suggestion_weapon.name}"
+            return 1 # Game over, player wins
+        self.prev_action[2] = f"     and falsely accused {action.suggestion_weapon.name} with {action.suggestion_char.name}"
         player.is_disqulified = True
         return 0      
 
@@ -120,6 +120,6 @@ class CluedoGame:
         for t in self.prev_action:
             draw_text(t, (160,255,200), (500, position), screen)
             position = position + 30
-        draw_text("Solution: {0}, {1}, {2}".format(self.solution[0].name, self.solution[1].name, self.solution[2].name), (200,200,200), (500, position), screen)
+        draw_text(f"Solution: {self.solution[0].name}, {self.solution[1].name}, {self.solution[2].name}", (200,200,200), (500, position), screen)
 
 
